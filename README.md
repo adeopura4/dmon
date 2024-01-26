@@ -1,8 +1,8 @@
 ## dmon
-[@septag](https://twitter.com/septagh)  
+[@septag](https://twitter.com/septagh)
 
 _dmon_ is a tiny C library that monitors changes in a directory.
-It provides a unified solution to multiple system APIs that exist for each OS. It can also monitor directories recursively. 
+It provides a unified solution to multiple system APIs that exist for each OS. It can also monitor directories recursively.
 
 ### Platforms
 - Windows: `ReadDirectoryChangesW` backend. Tested with Windows10 SDK + Visual Studio 2019
@@ -24,10 +24,10 @@ static void watch_callback(dmon_watch_id watch_id, dmon_action action, const cha
     // receive change events. type of event is stored in 'action' variable
 }
 
-int main() 
+int main()
 {
     dmon_init();
-    dmon_watch("/path/to/directory", watch_callback, DMON_WATCHFLAGS_RECURSIVE, NULL); 
+    dmon_watch("/path/to/directory", watch_callback, DMON_WATCHFLAGS_RECURSIVE, NULL);
     // wait ...
     dmon_deinit();
 	return 0;
@@ -43,9 +43,9 @@ To build on MacOS, link with `CoreServices` and `CoreFoundation`:
 ```clang test.c -framework CoreFoundation -framework CoreServices -lpthread -o test```
 
 ### Linux Extras
-There is this other file `dmon_extra.h` that you can include optionally after `dmon.h` for linux backend. 
-There are two APIs that are introduced in that header, `dmon_watch_add` and `dmon_watch_rm` in which you can add/remove 
-sub-directories to currently watched directory. This can be useful in cases where there are large set of changes happening 
+There is this other file `dmon_extra.h` that you can include optionally after `dmon.h` for linux backend.
+There are two APIs that are introduced in that header, `dmon_watch_add` and `dmon_watch_rm` in which you can add/remove
+sub-directories to currently watched directory. This can be useful in cases where there are large set of changes happening
 on linux backend and you won't get all the events, because of some drawbacks of the `inotify` backend. So, by disabling `DMON_WATCHFLAGS_RECURSIVE` and using these functions to manually handle directory recursion, you can workaround those issues.
 
 
@@ -57,19 +57,19 @@ on linux backend and you won't get all the events, because of some drawbacks of 
 </a>
 
 	Copyright 2019 Sepehr Taghdisian. All rights reserved.
-	
+
 	https://github.com/septag/dmon
-	
+
 	Redistribution and use in source and binary forms, with or without
 	modification, are permitted provided that the following conditions are met:
-	
+
 	   1. Redistributions of source code must retain the above copyright notice,
 	      this list of conditions and the following disclaimer.
-	
+
 	   2. Redistributions in binary form must reproduce the above copyright notice,
 	      this list of conditions and the following disclaimer in the documentation
 	      and/or other materials provided with the distribution.
-	
+
 	THIS SOFTWARE IS PROVIDED BY COPYRIGHT HOLDER ``AS IS'' AND ANY EXPRESS OR
 	IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 	MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
@@ -80,3 +80,36 @@ on linux backend and you won't get all the events, because of some drawbacks of 
 	LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
 	OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 	ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+************************************************************************************************
+Added by Adeopura
+************************************************************************************************
+To compile on MacOS:
+Go to:
+/Users/adeopura/dmon
+
+Type the following command:
+clang test.c -framework CoreFoundation -framework CoreServices -lpthread -o test
+
+To run on MacOS:
+1. Open terminal
+
+2. Type the command as below:
+   ./test '/Users/adeopura/Desktop/bublup-sync-test/'
+
+On your finder, go into the directory above. When you create, modify or remove a file, you will get the appropriate message in the terminal
+
+************************************************************************************************
+To compile on Windows:
+Go to C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools
+Double click on LaunchDevCmd
+
+type the below command
+cl test.c
+
+Go to
+C:\Users\adeop\OneDrive\Documents\GitHub\dmon
+Type command below
+test C:\Users\adeop\bublup-sync-test
+
+On your file explorer, go into the directory above. When you create, modify or remove a file, you will get the appropriate message in the terminal
