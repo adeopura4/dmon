@@ -971,7 +971,7 @@ _DMON_PRIVATE void _dmon_inotify_process_events(void)
                 if ((check_ev->mask & IN_MODIFY) && strcmp(ev->filepath, check_ev->filepath) == 0) {
                     check_ev->skip = true;
                     break;
-                }                
+                }
             }
         }
     }
@@ -1429,7 +1429,7 @@ _DMON_PRIVATE void _dmon_fsevent_process_events(void)
             watch->watch_cb(ev->watch_id, DMON_ACTION_CREATE, watch->rootdir_unmod, ev->filepath, NULL,
                             watch->user_data);
         }
-        
+
         if (ev->event_flags & kFSEventStreamEventFlagItemModified) {
             watch->watch_cb(ev->watch_id, DMON_ACTION_MODIFY, watch->rootdir_unmod, ev->filepath, NULL, watch->user_data);
         } else if (ev->event_flags & kFSEventStreamEventFlagItemRenamed) {
@@ -1580,6 +1580,18 @@ _DMON_PRIVATE void _dmon_fsevent_callback(ConstFSEventStreamRef stream_ref, void
         for (i = 0; i < num_events; i++) {
             const char *filepath = ((const char **) event_paths)[i];
             long flags = (long) event_flags[i];
+
+            // adeopura:
+            // On MacOS 14.1.1 Apple Silicon M1, if you modify a file in a watched directory, it is reported as a "create" event instead of a modify event.
+            // For my test, I used a textedit file and changed some text, and saw that this was reported as a "create" event.
+            // It seems that another library (caleld fswatch), which does change detection, had this issue reported
+            // @see https://github.com/emcrisostomo/fswatch/pull/279
+            // I have taken what was implemented above and made the change below
+            if (flags & kFSEventStreamEventFlagItemXattrMod){
+                flags = flags | kFSEventStreamEventFlagItemModified;
+            }
+            // End of change
+
             uint64_t event_id = (uint64_t) event_ids[i];
             dmon__fsevent_event ev;
             memset(&ev, 0x0, sizeof(ev));
